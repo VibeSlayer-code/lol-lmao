@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catacomb Navigation - etuniXe</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #000000;
+        color: #ffffff;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      .sidebar {
+        width: 480px;
+        background: #0a0a0a;
+        padding: 32px;
+        overflow-y: auto;
+        border-right: 1px solid #1a1a1a;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 4px;
+      }
+
+      .header {
+        margin-bottom: 24px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #ffffff;
+        letter-spacing: -0.8px;
+      }
+
+      .header p {
+        font-size: 15px;
+        color: #666666;
+        line-height: 1.6;
+      }
+
+      .live-status {
+        background: linear-gradient(
+          135deg,
+          rgba(134, 84, 216, 0.1) 0%,
+          rgba(134, 84, 216, 0.05) 100%
+        );
+        border: 1px solid rgba(134, 84, 216, 0.2);
+        padding: 16px 18px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .live-indicator {
+        width: 10px;
+        height: 10px;
+        background: #8654d8;
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+
+      .live-status-text {
+        flex: 1;
+      }
+
+      .live-status-text strong {
+        color: #8654d8;
+        font-weight: 600;
+        font-size: 13px;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .live-status-text span {
+        color: #999999;
+        font-size: 12px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        background: #0f0f0f;
+        border: 1px solid #1a1a1a;
+        padding: 16px;
+        border-radius: 10px;
+      }
+
+      .stat-card .label {
+        font-size: 12px;
+        color: #666666;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-card .value {
+        font-size: 24px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .stat-card .change {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .stat-card .change.positive {
+        color: #8654d8;
+      }
+
+      .stat-card .change.negative {
+        color: #c86464;
+      }
+
+      .notice-card {
+        background: linear-gradient(
+          135deg,
+          rgba(200, 100, 100, 0.08) 0%,
+          rgba(200, 100, 100, 0.04) 100%
+        );
+        border: 1px solid rgba(200, 100, 100, 0.2);
+        padding: 18px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+      }
+
+      .notice-card strong {
+        color: #c86464;
+        font-weight: 600;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .notice-card p {
+        color: #999999;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .section {
+        background: #0f0f0f;
+        border: 1px solid #1a1a1a;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #ffffff;
+        letter-spacing: -0.3px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group:last-of-type {
+        margin-bottom: 20px;
+      }
+
+      .custom-dropdown {
+        position: relative;
+        width: 100%;
+      }
+
+      .dropdown-header {
+        width: 100%;
+        padding: 14px 16px;
+        background: #000000;
+        border: 1px solid #2a2a2a;
+        color: #ffffff;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+      }
+
+      .dropdown-header:hover {
+        border-color: #3a3a3a;
+      }
+
+      .dropdown-header.active {
+        border-color: #8654d8;
+      }
+
+      .dropdown-header .placeholder {
+        color: #666666;
+      }
+
+      .dropdown-header .selected {
+        color: #ffffff;
+      }
+
+      .dropdown-arrow {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s;
+      }
+
+      .dropdown-arrow svg {
+        width: 12px;
+        height: 12px;
+        fill: #666666;
+      }
+
+      .dropdown-header.active .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        width: 100%;
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 100;
+      }
+
+      .dropdown-menu.active {
+        max-height: 300px;
+        opacity: 1;
+        overflow-y: auto;
+      }
+
+      .dropdown-menu::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .dropdown-menu::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .dropdown-menu::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 3px;
+      }
+
+      .dropdown-item {
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #cccccc;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .dropdown-item:hover {
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+
+      .dropdown-item.selected {
+        background: rgba(134, 84, 216, 0.1);
+        color: #8654d8;
+      }
+
+      .button-primary {
+        width: 100%;
+        padding: 14px;
+        background: #8654d8;
+        border: none;
+        color: #ffffff;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        letter-spacing: 0.2px;
+      }
+
+      .button-primary:hover {
+        background: #7444c8;
+        transform: translateY(-1px);
+      }
+
+      .button-primary:active {
+        background: #6434b8;
+        transform: translateY(0);
+      }
+
+      .route-details {
+        margin-top: 20px;
+        padding: 20px;
+        background: #000000;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        display: none;
+      }
+
+      .route-details.active {
+        display: block;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        font-size: 14px;
+      }
+
+      .detail-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .detail-label {
+        color: #666666;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .route-path {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #1a1a1a;
+      }
+
+      .route-path .detail-label {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .route-path .detail-value {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #999999;
+        font-weight: 500;
+      }
+
+      .route-warnings {
+        margin-top: 16px;
+        padding: 14px;
+        background: rgba(134, 84, 216, 0.05);
+        border-radius: 8px;
+        font-size: 13px;
+        color: #999999;
+        line-height: 1.5;
+      }
+
+      .legend-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .legend-indicator {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .legend-text {
+        flex: 1;
+      }
+
+      .legend-text strong {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #ffffff;
+      }
+
+      .legend-text small {
+        font-size: 13px;
+        color: #666666;
+      }
+
+      .district-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .district-card {
+        background: #0a0a0a;
+        border: 1px solid #1a1a1a;
+        padding: 16px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+      }
+
+      .district-card:hover {
+        background: #0f0f0f;
+        border-color: #2a2a2a;
+        transform: translateX(4px);
+      }
+
+      .district-card h4 {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .district-card p {
+        font-size: 13px;
+        color: #666666;
+        margin: 0;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .status-safe {
+        background: #8654d8;
+      }
+
+      .status-caution {
+        background: #c89664;
+      }
+
+      .status-danger {
+        background: #c86464;
+        animation: blink 1.5s ease-in-out infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .activity-feed {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .activity-feed::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .activity-feed::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .activity-feed::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 3px;
+      }
+
+      .activity-item {
+        padding: 12px;
+        background: #0a0a0a;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid #8654d8;
+      }
+
+      .activity-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .activity-item .time {
+        font-size: 11px;
+        color: #666666;
+        margin-bottom: 4px;
+      }
+
+      .activity-item .message {
+        font-size: 13px;
+        color: #cccccc;
+        line-height: 1.4;
+      }
+
+      .map-container {
+        flex: 1;
+        position: relative;
+        background: #000000;
+      }
+
+      #map3d {
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls-panel {
+        position: absolute;
+        bottom: 28px;
+        left: 28px;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid #1a1a1a;
+        padding: 18px 22px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+
+      .controls-panel div {
+        margin-bottom: 8px;
+        color: #999999;
+      }
+
+      .controls-panel div:last-child {
+        margin-bottom: 0;
+      }
+
+      .controls-panel strong {
+        color: #ffffff;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 12px;
+        font-size: 14px;
+      }
+
+      .info-panel {
+        position: absolute;
+        top: 28px;
+        right: 28px;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid #1a1a1a;
+        padding: 24px;
+        border-radius: 12px;
+        max-width: 360px;
+        display: none;
+      }
+
+      .info-panel.active {
+        display: block;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .info-panel h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+      }
+
+      .info-panel p {
+        font-size: 14px;
+        margin-bottom: 16px;
+        line-height: 1.6;
+        color: #999999;
+      }
+
+      .info-detail {
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .info-detail:last-of-type {
+        margin-bottom: 16px;
+      }
+
+      .info-detail strong {
+        color: #666666;
+        font-weight: 500;
+      }
+
+      .info-detail span {
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .badge-safe {
+        background: rgba(134, 84, 216, 0.12);
+        color: #8654d8;
+      }
+
+      .badge-caution {
+        background: rgba(200, 150, 100, 0.12);
+        color: #c89664;
+      }
+
+      .badge-danger {
+        background: rgba(200, 100, 100, 0.12);
+        color: #c86464;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 28px;
+        left: 28px;
+        padding: 12px 20px;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid #1a1a1a;
+        border-radius: 10px;
+        color: #ffffff;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .back-button:hover {
+        border-color: #2a2a2a;
+        transform: translateX(-2px);
+      }
+
+      .color-safe {
+        color: #8654d8;
+      }
+
+      .color-caution {
+        color: #c89664;
+      }
+
+      .color-danger {
+        color: #c86464;
+      }
+
+      .hazard-overlay {
+        position: absolute;
+        top: 100px;
+        right: 28px;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(200, 100, 100, 0.3);
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 320px;
+        display: none;
+      }
+
+      .hazard-overlay.active {
+        display: block;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .hazard-overlay h4 {
+        color: #c86464;
+        font-size: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .hazard-overlay .warning-icon {
+        width: 20px;
+        height: 20px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .hazard-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .hazard-item {
+        background: rgba(200, 100, 100, 0.08);
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 3px solid #c86464;
+      }
+
+      .hazard-item .location {
+        color: #c86464;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .hazard-item .description {
+        color: #999999;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <div class="header">
+          <h1>Catacomb Map</h1>
+          <p>Real-time monitoring & navigation system for etuniXe</p>
+        </div>
+
+        <div class="live-status">
+          <div class="live-indicator"></div>
+          <div class="live-status-text">
+            <strong>Nixun Is Online</strong>
+            <span>Last updated: <span id="lastUpdate">Just now</span></span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">Total Population</div>
+            <div class="value" id="totalPopulation">1,061</div>
+            <div class="change positive" id="popChange">+12 today</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Active Alerts</div>
+            <div class="value" id="activeAlerts">3</div>
+            <div class="change negative" id="alertChange">+1 new</div>
+          </div>
+        </div>
+
+        <div class="notice-card">
+          <strong>Dynamic Safety Alert</strong>
+          <p>Conditions change every 30 seconds. Check status before travel.</p>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Route Planner</h3>
+          <div class="form-group">
+            <div class="custom-dropdown" id="fromDropdown">
+              <div class="dropdown-header">
+                <span class="placeholder">From: Select Start</span>
+                <div class="dropdown-arrow">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" data-value="entrance">
+                  Main Entrance
+                </div>
+                <div class="dropdown-item" data-value="residential">
+                  Residential District
+                </div>
+                <div class="dropdown-item" data-value="agriculture">
+                  Agriculture Zone
+                </div>
+                <div class="dropdown-item" data-value="industrial">
+                  Industrial Sector
+                </div>
+                <div class="dropdown-item" data-value="defense">
+                  Defense Perimeter
+                </div>
+                <div class="dropdown-item" data-value="central">
+                  Central Hub
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-dropdown" id="toDropdown">
+              <div class="dropdown-header">
+                <span class="placeholder">To: Select Destination</span>
+                <div class="dropdown-arrow">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" data-value="entrance">
+                  Main Entrance
+                </div>
+                <div class="dropdown-item" data-value="residential">
+                  Residential District
+                </div>
+                <div class="dropdown-item" data-value="agriculture">
+                  Agriculture Zone
+                </div>
+                <div class="dropdown-item" data-value="industrial">
+                  Industrial Sector
+                </div>
+                <div class="dropdown-item" data-value="defense">
+                  Defense Perimeter
+                </div>
+                <div class="dropdown-item" data-value="central">
+                  Central Hub
+                </div>
+                <div class="dropdown-item" data-value="expansion">
+                  Expansion Zone
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="button-primary" onclick="calculateRoute()">
+            Calculate Route
+          </button>
+
+          <div id="routeInfo" class="route-details">
+            <div class="detail-row">
+              <span class="detail-label">Distance</span>
+              <span class="detail-value" id="routeDistance">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Travel Time</span>
+              <span class="detail-value" id="routeTime">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Safety Level</span>
+              <span class="detail-value" id="routeDanger">--</span>
+            </div>
+            <div class="route-path">
+              <div class="detail-label">Route</div>
+              <div class="detail-value" id="routePath">--</div>
+            </div>
+            <div id="routeWarnings" class="route-warnings"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Safety Zones</h3>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <div class="legend-indicator" style="background: #8654d8"></div>
+              <div class="legend-text">
+                <strong>Safe</strong>
+                <small>Secured and regularly patrolled</small>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-indicator" style="background: #c89664"></div>
+              <div class="legend-text">
+                <strong>Caution</strong>
+                <small>Proceed with awareness</small>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-indicator" style="background: #c86464"></div>
+              <div class="legend-text">
+                <strong>Danger</strong>
+                <small>Restricted access only</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Districts</h3>
+          <div class="district-list" id="districtList"></div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Recent Activity</h3>
+          <div class="activity-feed" id="activityFeed"></div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <a href="index.html" class="back-button">← Back to Home</a>
+        <canvas id="map3d"></canvas>
+
+        <div class="controls-panel">
+          <strong>Controls</strong>
+          <div>Drag: Rotate view</div>
+          <div>Scroll: Zoom in/out</div>
+          <div>Click: View details</div>
+        </div>
+
+        <div id="infoPanel" class="info-panel">
+          <h3 id="panelTitle">District Name</h3>
+          <p id="panelDescription">Description</p>
+          <div class="info-detail">
+            <strong>Population</strong>
+            <span id="panelPop">--</span>
+          </div>
+          <div class="info-detail">
+            <strong>Status</strong>
+            <span id="panelStatus">--</span>
+          </div>
+          <div class="info-detail">
+            <strong>Travel Time</strong>
+            <span id="panelTime">--</span>
+          </div>
+          <div id="panelDanger" class="badge badge-safe">SAFE</div>
+        </div>
+
+        <div id="hazardOverlay" class="hazard-overlay">
+          <h4>
+            <svg class="warning-icon" viewBox="0 0 24 24" fill="#c86464">
+              <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+            </svg>
+            Active Hazards
+          </h4>
+          <div class="hazard-list" id="hazardList"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      const safetyLevels = ["safe", "caution", "danger"];
+      const districtNames = [
+        "residential",
+        "agriculture",
+        "industrial",
+        "defense",
+        "expansion",
+      ];
+
+      let districtSafetyStates = {};
+      let activityLog = [];
+      let hazardAlerts = [];
+
+      function initializeSafetyStates() {
+        districtNames.forEach((name) => {
+          const randomLevel =
+            safetyLevels[Math.floor(Math.random() * safetyLevels.length)];
+          districtSafetyStates[name] = randomLevel;
+        });
+        districtSafetyStates["entrance"] = "safe";
+        districtSafetyStates["central"] = "safe";
+      }
+
+      function updateSafetyStates() {
+        const changeProbability = 0.3;
+        districtNames.forEach((name) => {
+          if (Math.random() < changeProbability) {
+            const oldLevel = districtSafetyStates[name];
+            const newLevel =
+              safetyLevels[Math.floor(Math.random() * safetyLevels.length)];
+
+            if (oldLevel !== newLevel) {
+              districtSafetyStates[name] = newLevel;
+              addActivityLog(name, oldLevel, newLevel);
+
+              if (newLevel === "danger") {
+                addHazardAlert(name);
+              }
+            }
+          }
+        });
+
+        updateDistrictDisplay();
+        updateStats();
+      }
+
+      function addActivityLog(district, oldLevel, newLevel) {
+        const time = new Date().toLocaleTimeString();
+        const message = `${districts[district].name} changed from ${oldLevel} to ${newLevel}`;
+        activityLog.unshift({ time, message, level: newLevel });
+
+        if (activityLog.length > 10) {
+          activityLog.pop();
+        }
+
+        updateActivityFeed();
+      }
+
+      function addHazardAlert(district) {
+        const hazards = [
+          "Structural instability detected",
+          "Gas leak reported",
+          "Equipment malfunction",
+          "Temperature anomaly",
+          "Water seepage detected",
+        ];
+
+        const hazard = {
+          location: districts[district].name,
+          description: hazards[Math.floor(Math.random() * hazards.length)],
+        };
+
+        hazardAlerts.unshift(hazard);
+        if (hazardAlerts.length > 3) {
+          hazardAlerts.pop();
+        }
+
+        updateHazardOverlay();
+      }
+
+      function updateActivityFeed() {
+        const feed = document.getElementById("activityFeed");
+        feed.innerHTML = activityLog
+          .map(
+            (activity) => `
+                <div class="activity-item">
+                    <div class="time">${activity.time}</div>
+                    <div class="message">${activity.message}</div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function updateHazardOverlay() {
+        const hazardList = document.getElementById("hazardList");
+        const overlay = document.getElementById("hazardOverlay");
+
+        if (hazardAlerts.length > 0) {
+          hazardList.innerHTML = hazardAlerts
+            .map(
+              (hazard) => `
+                    <div class="hazard-item">
+                        <div class="location">${hazard.location}</div>
+                        <div class="description">${hazard.description}</div>
+                    </div>
+                `
+            )
+            .join("");
+          overlay.classList.add("active");
+        } else {
+          overlay.classList.remove("active");
+        }
+      }
+
+      function updateStats() {
+        const dangerCount = Object.values(districtSafetyStates).filter(
+          (s) => s === "danger"
+        ).length;
+        document.getElementById("activeAlerts").textContent = dangerCount + 3;
+
+        const basePopulation = 1061;
+        const variance = Math.floor(Math.random() * 10) - 5;
+        document.getElementById("totalPopulation").textContent = (
+          basePopulation + variance
+        ).toLocaleString();
+      }
+
+      function updateDistrictDisplay() {
+        const districtList = document.getElementById("districtList");
+        const districtData = [
+          { key: "entrance", name: "Main Entrance", info: "Access Point" },
+          {
+            key: "residential",
+            name: "Residential District",
+            info: "Population: 892",
+          },
+          { key: "agriculture", name: "Agriculture Zone", info: "Workers: 45" },
+          { key: "central", name: "Central Hub", info: "Meeting Point" },
+          {
+            key: "industrial",
+            name: "Industrial Sector",
+            info: "24/7 Operations",
+          },
+          { key: "defense", name: "Defense Perimeter", info: "Guards: 34" },
+          {
+            key: "expansion",
+            name: "Expansion Zone",
+            info: "Under Construction",
+          },
+        ];
+
+        districtList.innerHTML = districtData
+          .map((district) => {
+            const safety = districtSafetyStates[district.key];
+            return `
+                    <div class="district-card" onclick="focusDistrict('${
+                      district.key
+                    }')">
+                        <h4>
+                            <span class="status-dot status-${safety}"></span>
+                            ${district.name}
+                        </h4>
+                        <p>${district.info} • ${
+              safety.charAt(0).toUpperCase() + safety.slice(1)
+            } Zone</p>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      class CustomDropdown {
+        constructor(element) {
+          this.element = element;
+          this.header = element.querySelector(".dropdown-header");
+          this.menu = element.querySelector(".dropdown-menu");
+          this.items = element.querySelectorAll(".dropdown-item");
+          this.selectedValue = "";
+
+          this.init();
+        }
+
+        init() {
+          this.header.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.toggle();
+          });
+
+          this.items.forEach((item) => {
+            item.addEventListener("click", (e) => {
+              e.stopPropagation();
+              this.select(item);
+            });
+          });
+
+          document.addEventListener("click", () => {
+            this.close();
+          });
+        }
+
+        toggle() {
+          const isActive = this.header.classList.contains("active");
+
+          document.querySelectorAll(".dropdown-header").forEach((h) => {
+            h.classList.remove("active");
+          });
+          document.querySelectorAll(".dropdown-menu").forEach((m) => {
+            m.classList.remove("active");
+          });
+
+          if (!isActive) {
+            this.header.classList.add("active");
+            this.menu.classList.add("active");
+          }
+        }
+
+        close() {
+          this.header.classList.remove("active");
+          this.menu.classList.remove("active");
+        }
+
+        select(item) {
+          this.selectedValue = item.getAttribute("data-value");
+          const text = item.textContent;
+
+          this.items.forEach((i) => i.classList.remove("selected"));
+          item.classList.add("selected");
+
+          this.header.innerHTML = `
+                    <span class="selected">${text}</span>
+                    <div class="dropdown-arrow">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </div>
+                `;
+
+          this.close();
+        }
+
+        getValue() {
+          return this.selectedValue;
+        }
+      }
+
+      const fromDropdown = new CustomDropdown(
+        document.getElementById("fromDropdown")
+      );
+      const toDropdown = new CustomDropdown(
+        document.getElementById("toDropdown")
+      );
+
+      const canvas = document.getElementById("map3d");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.Fog(0x000000, 50, 120);
+
+      const camera = new THREE.PerspectiveCamera(
+        55,
+        canvas.clientWidth / canvas.clientHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(35, 35, 35);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      renderer.shadowMap.enabled = true;
+
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      directionalLight.position.set(40, 50, 30);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      const pointLight = new THREE.PointLight(0x8654d8, 0.8, 80);
+      pointLight.position.set(0, 20, 0);
+      scene.add(pointLight);
+
+      const floorGeometry = new THREE.PlaneGeometry(90, 90, 40, 40);
+      const floorMaterial = new THREE.MeshStandardMaterial({
+        color: 0x0a0a0a,
+        roughness: 0.9,
+        metalness: 0.1,
+      });
+      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      const vertices = floorGeometry.attributes.position.array;
+      for (let i = 0; i < vertices.length; i += 3) {
+        vertices[i + 2] = Math.random() * 0.6 - 0.3;
+      }
+      floorGeometry.attributes.position.needsUpdate = true;
+      floorGeometry.computeVertexNormals();
+
+      const districts = {
+        entrance: {
+          name: "Main Entrance",
+          pop: "--",
+          status: "Active",
+          time: "0 min",
+          danger: "safe",
+          pos: [0, 3, -20],
+        },
+        residential: {
+          name: "Residential District",
+          pop: "892 residents",
+          status: "247 homes",
+          time: "12 min",
+          danger: "safe",
+          pos: [-15, 4, -15],
+        },
+        agriculture: {
+          name: "Agriculture Zone",
+          pop: "45 farmers",
+          status: "Feeding 1200+",
+          time: "8 min",
+          danger: "safe",
+          pos: [15, 3.5, -15],
+        },
+        central: {
+          name: "Central Hub",
+          pop: "Variable",
+          status: "Meeting point",
+          time: "5 min",
+          danger: "safe",
+          pos: [0, 3, 0],
+        },
+        industrial: {
+          name: "Industrial Sector",
+          pop: "67 workers",
+          status: "24/7 operations",
+          time: "15 min",
+          danger: "caution",
+          pos: [-15, 4, 15],
+        },
+        defense: {
+          name: "Defense Perimeter",
+          pop: "34 guards",
+          status: "Alert: Green",
+          time: "18 min",
+          danger: "caution",
+          pos: [15, 4, 15],
+        },
+        expansion: {
+          name: "Expansion Zone",
+          pop: "23 workers",
+          status: "34% complete",
+          time: "25 min",
+          danger: "danger",
+          pos: [0, 3, 20],
+        },
+      };
+
+      const roomObjects = {};
+      const colorMap = {
+        safe: 0x8654d8,
+        caution: 0xc89664,
+        danger: 0xc86464,
+      };
+
+      function createRoom(key, x, y, z, width, height, depth, color) {
+        const group = new THREE.Group();
+        group.userData = { district: key };
+
+        const wallThickness = 0.5;
+        const walls = [
+          { w: width, h: height, d: wallThickness, x: 0, y: 0, z: -depth / 2 },
+          { w: width, h: height, d: wallThickness, x: 0, y: 0, z: depth / 2 },
+          { w: wallThickness, h: height, d: depth, x: -width / 2, y: 0, z: 0 },
+          { w: wallThickness, h: height, d: depth, x: width / 2, y: 0, z: 0 },
+        ];
+
+        walls.forEach((wall) => {
+          const geometry = new THREE.BoxGeometry(wall.w, wall.h, wall.d);
+          const material = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.7,
+            metalness: 0.3,
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(wall.x, wall.y, wall.z);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.userData = { materialRef: material };
+          group.add(mesh);
+
+          const edges = new THREE.EdgesGeometry(geometry);
+          const line = new THREE.LineSegments(
+            edges,
+            new THREE.LineBasicMaterial({
+              color: 0x333333,
+              opacity: 0.6,
+              transparent: true,
+            })
+          );
+          line.position.copy(mesh.position);
+          group.add(line);
+        });
+
+        const ceilingGeometry = new THREE.BoxGeometry(width, 0.4, depth);
+        const ceilingMaterial = new THREE.MeshStandardMaterial({
+          color: 0x1a1a1a,
+          roughness: 0.8,
+          metalness: 0.2,
+        });
+        const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+        ceiling.position.y = height / 2;
+        ceiling.castShadow = true;
+        group.add(ceiling);
+
+        const labelCanvas = document.createElement("canvas");
+        const context = labelCanvas.getContext("2d");
+        labelCanvas.width = 512;
+        labelCanvas.height = 128;
+        context.fillStyle = "#ffffff";
+        context.font = "600 42px -apple-system, BlinkMacSystemFont, sans-serif";
+        context.textAlign = "center";
+        context.fillText(districts[key].name, 256, 75);
+
+        const texture = new THREE.CanvasTexture(labelCanvas);
+        const labelMaterial = new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+        });
+        const label = new THREE.Sprite(labelMaterial);
+        label.scale.set(9, 2.2, 1);
+        label.position.y = height / 2 + 2.5;
+        group.add(label);
+
+        group.position.set(x, y, z);
+        scene.add(group);
+        roomObjects[key] = group;
+        return group;
+      }
+
+      function updateRoomColors() {
+        Object.keys(roomObjects).forEach((key) => {
+          if (districtSafetyStates[key]) {
+            const newColor = colorMap[districtSafetyStates[key]];
+            const group = roomObjects[key];
+
+            group.children.forEach((child) => {
+              if (child instanceof THREE.Mesh && child.userData.materialRef) {
+                child.userData.materialRef.color.setHex(newColor);
+              }
+            });
+
+            districts[key].danger = districtSafetyStates[key];
+          }
+        });
+      }
+
+      function createTunnel(x1, z1, x2, z2, y = 1.5) {
+        const dx = x2 - x1;
+        const dz = z2 - z1;
+        const length = Math.sqrt(dx * dx + dz * dz);
+        const angle = Math.atan2(dz, dx);
+
+        const geometry = new THREE.BoxGeometry(length, 2.8, 2.8);
+        const material = new THREE.MeshStandardMaterial({
+          color: 0x1a1a1a,
+          roughness: 0.8,
+          metalness: 0.2,
+        });
+        const tunnel = new THREE.Mesh(geometry, material);
+        tunnel.position.set((x1 + x2) / 2, y, (z1 + z2) / 2);
+        tunnel.rotation.y = angle;
+        tunnel.castShadow = true;
+        tunnel.receiveShadow = true;
+        scene.add(tunnel);
+
+        for (let i = 0; i < 2; i++) {
+          const pipeGeometry = new THREE.CylinderGeometry(
+            0.15,
+            0.15,
+            length,
+            8
+          );
+          const pipeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x404040,
+            roughness: 0.4,
+            metalness: 0.6,
+          });
+          const pipe = new THREE.Mesh(pipeGeometry, pipeMaterial);
+          pipe.position.set((x1 + x2) / 2, y + 1.6 - i * 0.5, (z1 + z2) / 2);
+          pipe.rotation.z = Math.PI / 2;
+          pipe.rotation.y = angle;
+          scene.add(pipe);
+        }
+      }
+
+      initializeSafetyStates();
+
+      createRoom(
+        "entrance",
+        0,
+        3,
+        -20,
+        6,
+        6,
+        6,
+        colorMap[districtSafetyStates["entrance"]]
+      );
+      createRoom(
+        "residential",
+        -15,
+        4,
+        -15,
+        10,
+        8,
+        10,
+        colorMap[districtSafetyStates["residential"]]
+      );
+      createRoom(
+        "agriculture",
+        15,
+        3.5,
+        -15,
+        9,
+        7,
+        9,
+        colorMap[districtSafetyStates["agriculture"]]
+      );
+      createRoom(
+        "central",
+        0,
+        3,
+        0,
+        8,
+        6,
+        8,
+        colorMap[districtSafetyStates["central"]]
+      );
+      createRoom(
+        "industrial",
+        -15,
+        4,
+        15,
+        9,
+        8,
+        9,
+        colorMap[districtSafetyStates["industrial"]]
+      );
+      createRoom(
+        "defense",
+        15,
+        4,
+        15,
+        10,
+        8,
+        10,
+        colorMap[districtSafetyStates["defense"]]
+      );
+      createRoom(
+        "expansion",
+        0,
+        3,
+        20,
+        7,
+        6,
+        7,
+        colorMap[districtSafetyStates["expansion"]]
+      );
+
+      createTunnel(0, -20, 0, 0);
+      createTunnel(-15, -15, 0, 0);
+      createTunnel(15, -15, 0, 0);
+      createTunnel(-15, 15, 0, 0);
+      createTunnel(15, 15, 0, 0);
+      createTunnel(0, 0, 0, 20);
+      createTunnel(-15, -15, -15, 15);
+      createTunnel(15, -15, 15, 15);
+
+      for (let i = 0; i < 35; i++) {
+        const rockGeometry = new THREE.DodecahedronGeometry(
+          Math.random() * 0.5 + 0.3,
+          0
+        );
+        const rockMaterial = new THREE.MeshStandardMaterial({
+          color: 0x2a2a2a,
+          roughness: 0.9,
+          metalness: 0.1,
+        });
+        const rock = new THREE.Mesh(rockGeometry, rockMaterial);
+        rock.position.set(
+          Math.random() * 70 - 35,
+          0.3,
+          Math.random() * 70 - 35
+        );
+        rock.rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+        rock.castShadow = true;
+        scene.add(rock);
+      }
+
+      updateDistrictDisplay();
+      updateStats();
+
+      setInterval(() => {
+        updateSafetyStates();
+        updateRoomColors();
+        document.getElementById("lastUpdate").textContent = "Just now";
+      }, 30000);
+
+      let mouseDown = false;
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetRotationY = 0.8;
+      let targetRotationX = 0.5;
+
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+
+      canvas.addEventListener("click", (event) => {
+        if (mouseDown) return;
+
+        mouse.x = (event.clientX / canvas.clientWidth) * 2 - 1;
+        mouse.y = -(event.clientY / canvas.clientHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        const allObjects = [];
+        Object.values(roomObjects).forEach((group) => {
+          group.children.forEach((child) => {
+            if (child instanceof THREE.Mesh) {
+              allObjects.push(child);
+            }
+          });
+        });
+
+        const intersects = raycaster.intersectObjects(allObjects);
+
+        if (intersects.length > 0) {
+          const clickedGroup = intersects[0].object.parent;
+          const districtKey = clickedGroup.userData.district;
+          if (districtKey && districts[districtKey]) {
+            showDistrictInfo(districtKey);
+          }
+        }
+      });
+
+      canvas.addEventListener("mousedown", (e) => {
+        mouseDown = true;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        setTimeout(() => (mouseDown = false), 100);
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (!mouseDown) return;
+
+        const deltaX = e.clientX - mouseX;
+        const deltaY = e.clientY - mouseY;
+
+        targetRotationY += deltaX * 0.005;
+        targetRotationX += deltaY * 0.005;
+        targetRotationX = Math.max(
+          -Math.PI / 3,
+          Math.min(Math.PI / 3, targetRotationX)
+        );
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 1.05 : 0.95;
+        camera.position.multiplyScalar(delta);
+        camera.position.clampLength(18, 75);
+      });
+
+      window.addEventListener("resize", () => {
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      });
+
+      function showDistrictInfo(key) {
+        const district = districts[key];
+        const panel = document.getElementById("infoPanel");
+        document.getElementById("panelTitle").textContent = district.name;
+        document.getElementById("panelDescription").textContent =
+          getDescription(key);
+        document.getElementById("panelPop").textContent = district.pop;
+        document.getElementById("panelStatus").textContent = district.status;
+        document.getElementById("panelTime").textContent = district.time;
+
+        const dangerEl = document.getElementById("panelDanger");
+        dangerEl.className = "badge badge-" + district.danger;
+        dangerEl.textContent = district.danger.toUpperCase();
+
+        panel.classList.add("active");
+      }
+
+      function getDescription(key) {
+        const descriptions = {
+          entrance:
+            "Main access point to the catacomb network. Always monitored and secured.",
+          residential:
+            "Housing for 892 permanent residents. Features 247 micro-homes built into the walls.",
+          agriculture:
+            "Moss farms and mushroom cultivation zones. Feeds over 1,200 people daily.",
+          central:
+            "Community gathering point for meetings, social events, and town hall discussions.",
+          industrial:
+            "Equipment workshop, shrinking chamber, and medical facility. 24/7 operations.",
+          defense:
+            "Strategic watchtowers and emergency escape routes. 34 guards on rotation.",
+          expansion:
+            "Active construction zone. Unstable structure. Authorized personnel only.",
+        };
+        return descriptions[key] || "No description available.";
+      }
+
+      function focusDistrict(key) {
+        const district = districts[key];
+        if (district && district.pos) {
+          const [x, y, z] = district.pos;
+          targetRotationY = Math.atan2(x, z);
+          targetRotationX = Math.atan2(y - 3, Math.sqrt(x * x + z * z));
+          showDistrictInfo(key);
+        }
+      }
+
+      function calculateRoute() {
+        const from = fromDropdown.getValue();
+        const to = toDropdown.getValue();
+
+        if (!from || !to) {
+          alert("Please select both start and destination");
+          return;
+        }
+
+        if (from === to) {
+          alert("Start and destination cannot be the same");
+          return;
+        }
+
+        const fromSafety = districtSafetyStates[from] || districts[from].danger;
+        const toSafety = districtSafetyStates[to] || districts[to].danger;
+
+        const overallSafety =
+          fromSafety === "danger" || toSafety === "danger"
+            ? "Danger"
+            : fromSafety === "caution" || toSafety === "caution"
+            ? "Caution"
+            : "Safe";
+
+        const routes = {
+          "entrance-residential": {
+            distance: "450m",
+            time: "12 min",
+            path: "Entrance → Central Hub → Residential",
+            warnings: "None",
+          },
+          "entrance-agriculture": {
+            distance: "380m",
+            time: "8 min",
+            path: "Entrance → Agriculture",
+            warnings: "None",
+          },
+          "entrance-central": {
+            distance: "250m",
+            time: "5 min",
+            path: "Entrance → Central Hub",
+            warnings: "None",
+          },
+          "entrance-industrial": {
+            distance: "680m",
+            time: "15 min",
+            path: "Entrance → Central → Industrial",
+            warnings: "Heavy machinery noise. Wear hearing protection.",
+          },
+          "entrance-defense": {
+            distance: "720m",
+            time: "18 min",
+            path: "Entrance → Central → Defense",
+            warnings: "Security checkpoint active. Have ID ready.",
+          },
+          "entrance-expansion": {
+            distance: "950m",
+            time: "25 min",
+            path: "Entrance → Central → Expansion",
+            warnings:
+              "Unstable structure. Hard hat required. Travel in groups of 3 or more.",
+          },
+          "residential-agriculture": {
+            distance: "580m",
+            time: "14 min",
+            path: "Residential → Central → Agriculture",
+            warnings: "None",
+          },
+          "residential-central": {
+            distance: "320m",
+            time: "8 min",
+            path: "Residential → Central Hub",
+            warnings: "None",
+          },
+          "residential-industrial": {
+            distance: "520m",
+            time: "12 min",
+            path: "Residential → Industrial (direct)",
+            warnings: "Watch for workers during shift changes.",
+          },
+          "residential-defense": {
+            distance: "680m",
+            time: "16 min",
+            path: "Residential → Central → Defense",
+            warnings: "Announce yourself to security personnel.",
+          },
+          "residential-expansion": {
+            distance: "850m",
+            time: "22 min",
+            path: "Residential → Central → Expansion",
+            warnings: "Avoid unless emergency. High collapse risk.",
+          },
+          "agriculture-central": {
+            distance: "290m",
+            time: "7 min",
+            path: "Agriculture → Central Hub",
+            warnings: "None",
+          },
+          "agriculture-industrial": {
+            distance: "710m",
+            time: "17 min",
+            path: "Agriculture → Central → Industrial",
+            warnings: "Avoid peak hours (6-8am, 6-8pm).",
+          },
+          "agriculture-defense": {
+            distance: "550m",
+            time: "13 min",
+            path: "Agriculture → Defense (direct)",
+            warnings: "None",
+          },
+          "agriculture-expansion": {
+            distance: "920m",
+            time: "24 min",
+            path: "Agriculture → Central → Expansion",
+            warnings: "Do not travel alone.",
+          },
+          "central-industrial": {
+            distance: "420m",
+            time: "10 min",
+            path: "Central → Industrial",
+            warnings: "High noise levels. Bring ear protection.",
+          },
+          "central-defense": {
+            distance: "440m",
+            time: "11 min",
+            path: "Central → Defense",
+            warnings: "Security checkpoint. Have identification ready.",
+          },
+          "central-expansion": {
+            distance: "650m",
+            time: "17 min",
+            path: "Central → Expansion",
+            warnings: "Authorization required. Danger zone.",
+          },
+          "industrial-defense": {
+            distance: "680m",
+            time: "16 min",
+            path: "Industrial → Defense (perimeter)",
+            warnings: "Stay on marked paths.",
+          },
+          "industrial-expansion": {
+            distance: "580m",
+            time: "14 min",
+            path: "Industrial → Expansion (construction)",
+            warnings: "Extreme danger. Active construction zone.",
+          },
+          "defense-expansion": {
+            distance: "620m",
+            time: "15 min",
+            path: "Defense → Expansion (outer tunnel)",
+            warnings: "Pest activity reported. Travel with armed escort.",
+          },
+        };
+
+        const allRoutes = { ...routes };
+        Object.keys(routes).forEach((key) => {
+          const [start, end] = key.split("-");
+          const reverseKey = `${end}-${start}`;
+          allRoutes[reverseKey] = {
+            ...routes[key],
+            path: routes[key].path.split(" → ").reverse().join(" → "),
+          };
+        });
+
+        const routeKey = `${from}-${to}`;
+        const routeData = allRoutes[routeKey];
+
+        if (routeData) {
+          document.getElementById("routeDistance").textContent =
+            routeData.distance;
+          document.getElementById("routeTime").textContent = routeData.time;
+          document.getElementById("routeDanger").textContent = overallSafety;
+          document.getElementById("routeDanger").className =
+            overallSafety === "Safe"
+              ? "detail-value color-safe"
+              : overallSafety === "Caution"
+              ? "detail-value color-caution"
+              : "detail-value color-danger";
+          document.getElementById("routePath").textContent = routeData.path;
+
+          let warningText = routeData.warnings;
+          if (overallSafety === "Danger") {
+            warningText +=
+              " ALERT: Route passes through danger zones. Extreme caution advised.";
+          } else if (overallSafety === "Caution") {
+            warningText +=
+              " Note: Current conditions require heightened awareness.";
+          }
+
+          document.getElementById("routeWarnings").textContent = warningText;
+          document.getElementById("routeInfo").classList.add("active");
+
+          visualizeRoute(from, to);
+        } else {
+          alert("Route not found. Please try different locations.");
+        }
+      }
+
+      let routeLine = null;
+
+      function visualizeRoute(from, to) {
+        if (routeLine) {
+          scene.remove(routeLine);
+        }
+
+        const fromPos = districts[from]?.pos;
+        const toPos = districts[to]?.pos;
+
+        if (fromPos && toPos) {
+          const points = [];
+          points.push(new THREE.Vector3(fromPos[0], fromPos[1], fromPos[2]));
+
+          if (from !== "central" && to !== "central") {
+            const centralPos = districts.central.pos;
+            points.push(
+              new THREE.Vector3(centralPos[0], centralPos[1], centralPos[2])
+            );
+          }
+
+          points.push(new THREE.Vector3(toPos[0], toPos[1], toPos[2]));
+
+          const geometry = new THREE.BufferGeometry().setFromPoints(points);
+          const material = new THREE.LineBasicMaterial({
+            color: 0x8654d8,
+            linewidth: 3,
+            opacity: 0.9,
+            transparent: true,
+          });
+          routeLine = new THREE.Line(geometry, material);
+          scene.add(routeLine);
+
+          const midPoint = new THREE.Vector3(
+            (fromPos[0] + toPos[0]) / 2,
+            (fromPos[1] + toPos[1]) / 2 + 5,
+            (fromPos[2] + toPos[2]) / 2
+          );
+
+          targetRotationY = Math.atan2(midPoint.x, midPoint.z);
+          targetRotationX = Math.atan2(
+            midPoint.y - 3,
+            Math.sqrt(midPoint.x * midPoint.x + midPoint.z * midPoint.z)
+          );
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const radius = camera.position.length();
+        camera.position.x =
+          radius * Math.sin(targetRotationY) * Math.cos(targetRotationX);
+        camera.position.y = radius * Math.sin(targetRotationX);
+        camera.position.z =
+          radius * Math.cos(targetRotationY) * Math.cos(targetRotationX);
+        camera.lookAt(0, 3, 0);
+
+        if (roomObjects.central) {
+          roomObjects.central.rotation.y += 0.001;
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      document.addEventListener("click", (e) => {
+        const panel = document.getElementById("infoPanel");
+        if (
+          panel.classList.contains("active") &&
+          !panel.contains(e.target) &&
+          e.target !== canvas
+        ) {
+          panel.classList.remove("active");
+        }
+      });
+
+      document.getElementById("infoPanel").addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+    </script>
+  </body>
+</html>
