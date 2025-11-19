@@ -9,6 +9,7 @@
   background-color: #000000;
   color: #ffffff;
   overflow: hidden;
+  height: 100vh;
 }
 
 .container-map {
