@@ -35,7 +35,7 @@ function Home() {
   }, []);
 
   return (
-    <div>
+    <div className="home-page-wrapper">
       <div className="background-rectangle"></div>
       <div className="content-wrapper">
         <nav className="navigation-bar">

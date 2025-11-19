@@ -1,14 +1,3 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
 .login-container {
   height: 100vh;
   display: flex;
@@ -19,7 +8,7 @@ body {
 .left {
   position: relative;
   width: 50%;
-  height: 149.25vh;
+  height: 100%;
   background: #000000;
   padding: 60px 80px;
   overflow: hidden;
@@ -27,7 +16,7 @@ body {
 
 .right {
   width: 50%;
-  height: 149.25vh;
+  height: 100%;
   overflow: hidden;
 }
 
